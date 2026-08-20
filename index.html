@@ -324,33 +324,47 @@
                         </div>
 
                         <!-- Payment Summary -->
-                        <div class="pt-4 border-t border-slate-800 flex justify-between items-end">
-                            <div>
-                                <div class="text-xs text-slate-400">거치기간/상환기 월 평균 부담 이자</div>
-                                <div id="res-monthly-interest" class="text-xl font-bold text-white">약 66,667 원 / 월</div>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs text-slate-400">원리금 상환기 월 납입액 (추정)</div>
-                                <div id="res-monthly-payment" class="text-xl font-bold text-white">약 1,701,200 원 / 월</div>
-                            </div>
+                    <div class="pt-4 border-t border-slate-800 flex justify-between items-end">
+                        <div>
+                            <div class="text-xs text-slate-400">거치기간/상환기 월 평균 부담 이자</div>
+                            <div id="res-monthly-interest" class="text-xl font-bold text-white">약 66,667 원 / 월</div>
                         </div>
-                    </div>
-
-                    <!-- Chart Output Container -->
-                    <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
-                        <div class="text-xs font-bold text-slate-700 flex justify-between items-center">
-                            <span>대출 이자 감면 시구조 비교 (연간 부담액)</span>
-                            <span class="text-[11px] font-normal text-slate-500">단위: 만 원</span>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="paymentChart"></canvas>
+                        <div class="text-right">
+                            <div class="text-xs text-slate-400">원리금 상환기 월 납입액 (추정)</div>
+                            <div id="res-monthly-payment" class="text-xl font-bold text-white">약 1,701,200 원 / 월</div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- SECTION 3: TARGET AUDIENCE & SPECIFICATIONS -->
+                <!-- Calculator Link Banner -->
+                <div class="bg-gradient-to-r from-mg-blue to-mg-darkblue p-4 rounded-xl text-white shadow-sm flex items-center justify-between gap-4">
+                    <div class="space-y-0.5">
+                        <div class="font-bold text-sm flex items-center gap-1.5">
+                            <span>🧮 MG 대출·금리 상세 계산기</span>
+                        </div>
+                        <p class="text-xs text-blue-100">외부 계산기 모듈로 이동하여 더 상세한 수치를 계산해 보세요.</p>
+                    </div>
+                    <a href="https://kfcc023-del.github.io/mg/index2.html" target="_blank" class="flex-shrink-0 bg-white text-mg-blue hover:bg-blue-50 px-3.5 py-2 rounded-lg text-xs font-bold transition-colors shadow flex items-center gap-1">
+                        <span>계산기 이동</span>
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                </div>
+
+                <!-- Chart Output Container -->
+                <div class="bg-white p-4 rounded-xl border border-slate-200 space-y-2">
+                    <div class="text-xs font-bold text-slate-700 flex justify-between items-center">
+                        <span>대출 이자 감면 시구조 비교 (연간 부담액)</span>
+                        <span class="text-[11px] font-normal text-slate-500">단위: 만 원</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="paymentChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION 3: TARGET AUDIENCE & SPECIFICATIONS -->
         <section id="targets" class="space-y-6 scroll-mt-20">
             <div class="border-l-4 border-mg-blue pl-4">
                 <h2 class="text-xl font-bold text-slate-900">타깃 고객층 및 대출 상품 스펙</h2>
