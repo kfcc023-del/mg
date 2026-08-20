@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026년 주요 금융권 예적금 금리 동향 및 수신 전략 대시보드</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        mgNavy: '#0F2C59',
+                        mgBlue: '#005B96',
+                        mgLightBlue: '#E8F1F5',
+                        mgGreen: '#00875A',
+                        mgAccent: '#F39C12',
+                        bgWarm: '#F8FAFC'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 360px;
+            }
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-bgWarm text-slate-800 font-sans antialiased leading-relaxed min-h-screen flex flex-col">
+
+    <!-- Chosen Palette: Warm Professional Finance Palette (Deep Navy #0F2C59, MG Blue #005B96, Saemaul Green #00875A, Light Gray Background #F8FAFC, Gold Accent #F39C12) -->
+    <!-- Application Structure Plan: 
+        1. Executive KPI Summary Bar: Highlights current BOK base rate (2.50%), MG peak rates (3.91% / 4.44%), and max tax advantage gain (+47%).
+        2. Navigation Bar: Tabbed / Jump-to navigation for seamless flow (시장분석 -> 금리비교대시보드 -> 세후수익률계산기 -> 수신행동전략).
+        3. Market Trends & Overview: Introductory executive commentary and summary cards per sector.
+        4. Interactive Rate Comparison & Charts: Dynamic bar charts (Chart.js) + Searchable & Filterable Data Table with sector tabs, rate sorting, and ONE-CLICK EXCEL/CSV EXPORT BUTTON.
+        5. Interactive Tax Benefit Calculator: Allows users/staff to simulate deposit amounts, maturity, and tax rate differences (1.4% vs 15.4%), calculating exact tax savings and equivalent bank yield.
+        6. Action Plan & Strategy Framework: Interactive actionable task cards for MG staff (tax pop marketing, 50m protection assurance, digital channel targeting, roll-over retention).
+    -->
+    <!-- Visualization & Content Choices:
+        - Chart 1: Sector Rate Comparison (Bar Chart - Chart.js) -> Quick visual comparison of average max deposit/savings rates across 1st bank, internet bank, MG, and savings bank.
+        - Chart 2: Net Interest Breakdown for 30M Deposit (Stacked Horizontal Bar - Chart.js) -> Demonstrates tax leakage in standard banking vs tax savings in MG Saemaul Geumgo.
+        - Dynamic Excel Export -> Pure Vanilla JS generation of UTF-8 BOM CSV for flawless opening in Microsoft Excel without encoding issues.
+        - Interactive Calculator -> Live JS formulas for precise net interest calculations.
+        - Filterable Table -> Vanilla JS dynamically renders sorted/filtered rows with badge styling.
+        - CONFIRMATION: NO SVG graphics used. Icons implemented via standard Unicode or CSS pure shapes. NO Mermaid JS used.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <!-- Top Header & Banner -->
+    <header class="bg-mgNavy text-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="text-3xl">🏦</span>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">2026년 주요 금융권 예적금 금리 동향 및 수신 전략 대시보드</h1>
+                    <p class="text-xs sm:text-sm text-slate-300">작성자: 새마을금고 중앙회 수석 수신팀장 | 기준일자: 2026년 8월</p>
+                </div>
+            </div>
+            <div class="flex gap-2">
+                <a href="#calculator" class="bg-mgGreen hover:bg-emerald-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition shadow">
+                    🧮 세후 수익률 계산기
+                </a>
+                <a href="#action-plan" class="bg-mgAccent hover:bg-amber-600 text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition shadow">
+                    🎯 수신 실천 전략
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+        <!-- Executive KPI Cards -->
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-center text-slate-500 text-xs sm:text-sm font-medium">
+                    <span>한국은행 기준금리</span>
+                    <span>🇰🇷</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-1">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-slate-800">2.50%</span>
+                    <span class="text-xs text-slate-500 font-normal">유지 추세</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-1">금융권 정기예금 금리 하향 안정화</p>
+            </div>
+
+            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-center text-slate-500 text-xs sm:text-sm font-medium">
+                    <span>MG 최고 정기예금</span>
+                    <span class="text-emerald-600">★</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-1">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-mgNavy">3.91%</span>
+                    <span class="text-xs text-emerald-600 font-semibold">최고 우대</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">MG더뱅킹 비대면/우수금고 특판</p>
+            </div>
+
+            <div class="bg-white p-4 sm:p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-center text-slate-500 text-xs sm:text-sm font-medium">
+                    <span>MG 최고 정기적금</span>
+                    <span class="text-emerald-600">📈</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-1">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-mgGreen">4.44%</span>
+                    <span class="text-xs text-emerald-600 font-semibold">최고 우대</span>
+                </div>
+                <p class="text-xs text-slate-500 mt-1">모바일 특판 및 우수 조합 상품</p>
+            </div>
+
+            <div class="bg-emerald-50 p-4 sm:p-5 rounded-xl border border-emerald-200 shadow-sm flex flex-col justify-between hover:shadow-md transition">
+                <div class="flex justify-between items-center text-emerald-700 text-xs sm:text-sm font-semibold">
+                    <span>조합원 비과세 이득</span>
+                    <span>💰</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-1">
+                    <span class="text-2xl sm:text-3xl font-extrabold text-emerald-700">+47.0%</span>
+                    <span class="text-xs text-emerald-800">세후 실효이득</span>
+                </div>
+                <p class="text-xs text-emerald-600 mt-1">3천만원 예치 시 연 +369,798원 이익</p>
+            </div>
+        </section>
+
+        <!-- Section 1: Executive Market Analysis -->
+        <section class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="border-b border-slate-100 pb-3">
+                <h2 class="text-lg sm:text-xl font-bold text-mgNavy flex items-center gap-2">
+                    <span>📋</span> 1. 수석 수신팀장 총평 및 금융권 권역별 시장 환경 분석
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                    본 분석 섹션은 한국은행 기준금리 동향에 따른 각 금융권역별 수신 대응 현황 및 새마을금고의 핵심 경쟁력 위치를 종합 평가합니다.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 pt-2">
+                <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                    <div class="font-bold text-slate-800 text-sm mb-1 flex items-center justify-between">
+                        <span>1금융권 (시중은행)</span>
+                        <span class="bg-slate-200 text-slate-700 text-xs px-2 py-0.5 rounded">2.85~3.20%</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        기본금리 2.85~2.95% 수준 형성. 급여이체, 카드실적 등 주거래 우대조건을 복잡하게 충족해야 연 3.00~3.55% 확보 가능.
+                    </p>
+                </div>
+
+                <div class="p-4 bg-blue-50/60 rounded-xl border border-blue-100">
+                    <div class="font-bold text-mgNavy text-sm mb-1 flex items-center justify-between">
+                        <span>인터넷전문은행</span>
+                        <span class="bg-blue-100 text-mgNavy text-xs px-2 py-0.5 rounded">3.00~3.20%</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        영업점 운영비용 절감 바탕으로 조건이 단순한 3.00~3.20% 기본금리 제공. 젊은 층 수신을 빠르게 흡수 중.
+                    </p>
+                </div>
+
+                <div class="p-4 bg-amber-50/60 rounded-xl border border-amber-200">
+                    <div class="font-bold text-amber-900 text-sm mb-1 flex items-center justify-between">
+                        <span>저축은행</span>
+                        <span class="bg-amber-100 text-amber-900 text-xs px-2 py-0.5 rounded">3.50~4.40%</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        회전정기예금/특판 최고 4.10~4.40% 제공하나, 경영 안정성 관련 소비자 심리로 인해 호불호가 갈리는 추세.
+                    </p>
+                </div>
+
+                <div class="p-4 bg-emerald-50 rounded-xl border border-emerald-200">
+                    <div class="font-bold text-mgGreen text-sm mb-1 flex items-center justify-between">
+                        <span>새마을금고 (상호금융)</span>
+                        <span class="bg-mgGreen text-white text-xs px-2 py-0.5 rounded">예금 3.91% / 적금 4.44%</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        비대면(MG더뱅킹) 특판 및 <strong>'농어촌 특별세 제외 조합원 비과세(1.4% 저율과세, 3,000만원 한도)'</strong> 결합 시 세후 최고 수익률 압도.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Data Comparison & Visual Charts -->
+        <section class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                    <div>
+                        <h2 class="text-lg sm:text-xl font-bold text-mgNavy flex items-center gap-2">
+                            <span>📊</span> 2. 금융권별 예적금 금리 비교 현황 및 시각화
+                        </h2>
+                        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                            차트를 통해 금융권역별 금리 격차를 확인하고, 하단 탐색기에서 개별 상품 검색 및 엑셀(CSV) 내보내기가 가능합니다.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Charts Layout Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+                    <!-- Chart 1: Sector Average/Peak Rates -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center">
+                        <h3 class="text-sm font-bold text-slate-700 mb-2 w-full text-left flex items-center justify-between">
+                            <span>권역별 12개월 정기예금/적금 최고 금리 비교</span>
+                            <span class="text-xs font-normal text-slate-400">단위: %</span>
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="sectorRateChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Net Income Comparison for 30M Deposit -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-200 flex flex-col items-center">
+                        <h3 class="text-sm font-bold text-slate-700 mb-2 w-full text-left flex items-center justify-between">
+                            <span>3,000만 원 예치 시 세후 수령 이자 비교</span>
+                            <span class="text-xs font-normal text-slate-400">단위: 원</span>
+                        </h3>
+                        <div class="chart-container">
+                            <canvas id="netInterestChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Data Table & Filter Section -->
+                <div class="pt-4 space-y-4">
+                    <div class="flex flex-col lg:flex-row justify-between items-stretch lg:items-center gap-3 bg-slate-100 p-3 rounded-xl">
+                        <!-- Sector Filter Tabs -->
+                        <div class="flex flex-wrap gap-1.5" id="sectorFilters">
+                            <button onclick="filterSector('ALL')" class="sector-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-mgNavy text-white shadow-sm transition">전체보기</button>
+                            <button onclick="filterSector('1금융권')" class="sector-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 hover:bg-slate-200 transition">1금융권</button>
+                            <button onclick="filterSector('인터넷은행')" class="sector-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 hover:bg-slate-200 transition">인터넷은행</button>
+                            <button onclick="filterSector('상호금융')" class="sector-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 hover:bg-slate-200 transition">상호금융(새마을금고)</button>
+                            <button onclick="filterSector('저축은행')" class="sector-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 hover:bg-slate-200 transition">저축은행</button>
+                        </div>
+
+                        <!-- Product Type, Search Input, and Excel Export Button -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <select id="productTypeFilter" onchange="renderTable()" class="bg-white border border-slate-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-mgNavy">
+                                <option value="ALL">전체 상품종류</option>
+                                <option value="정기예금">정기예금</option>
+                                <option value="정기적금">정기적금</option>
+                            </select>
+                            <input type="text" id="searchInput" oninput="renderTable()" placeholder="기관명, 상품명 검색..." class="bg-white border border-slate-300 text-xs rounded-lg px-3 py-1.5 w-36 sm:w-48 focus:outline-none focus:ring-2 focus:ring-mgNavy">
+                            <button onclick="exportToExcel()" class="bg-mgGreen hover:bg-emerald-600 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition shadow-sm flex items-center gap-1">
+                                📊 엑셀 다운로드
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Table Responsive Container -->
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-slate-100 text-slate-700 uppercase font-bold text-[11px] border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3">금융권역</th>
+                                    <th class="p-3">기관명</th>
+                                    <th class="p-3">대표 상품명</th>
+                                    <th class="p-3 text-center">종류</th>
+                                    <th class="p-3 text-right cursor-pointer hover:text-mgNavy" onclick="sortBy('basicRate')">기본금리 ⇅</th>
+                                    <th class="p-3 text-right cursor-pointer hover:text-mgNavy" onclick="sortBy('maxRate')">최고우대금리 ⇅</th>
+                                    <th class="p-3 text-center">과세구분</th>
+                                    <th class="p-3">주요 우대조건 및 특징</th>
+                                </tr>
+                            </thead>
+                            <tbody id="depositTableBody" class="divide-y divide-slate-200 bg-white">
+                                <!-- Dynamic JS Injection -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Interactive Yield & Tax Calculator -->
+        <section id="calculator" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
+            <div class="border-b border-slate-100 pb-3">
+                <h2 class="text-lg sm:text-xl font-bold text-mgNavy flex items-center gap-2">
+                    <span>🧮</span> 3. 새마을금고 세후 실효수익률 시뮬레이터
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                    예치 원금과 금리를 조정하여 시중은행(일반과세 15.4%) 대비 새마을금고 조합원 저율과세(1.4%) 적용 시의 세후 실액 및 환산 수익률을 실시간 비교하세요.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Input Controls -->
+                <div class="lg:col-span-5 bg-slate-50 p-5 rounded-xl border border-slate-200 space-y-4">
+                    <h3 class="font-bold text-slate-800 text-sm border-b border-slate-200 pb-2">시뮬레이션 조건 설정</h3>
+                    
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">예치 금액 (원)</label>
+                        <input type="number" id="calcPrincipal" value="30000000" step="1000000" oninput="calculateYield()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-mgNavy focus:outline-none">
+                        <div class="flex justify-between text-[11px] text-slate-400 mt-1">
+                            <button onclick="setCalcPrincipal(10000000)" class="underline hover:text-slate-600">1천만원</button>
+                            <button onclick="setCalcPrincipal(30000000)" class="underline text-mgGreen font-bold">3천만원(비과세한도)</button>
+                            <button onclick="setCalcPrincipal(50000000)" class="underline hover:text-slate-600">5천만원(예금자보호)</button>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-600 mb-1">시중은행 금리 (%)</label>
+                            <input type="number" id="calcBankRate" value="3.10" step="0.05" oninput="calculateYield()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-bold text-slate-800 focus:ring-2 focus:ring-mgNavy focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-mgGreen mb-1">새마을금고 금리 (%)</label>
+                            <input type="number" id="calcMgRate" value="3.91" step="0.05" oninput="calculateYield()" class="w-full bg-white border border-emerald-300 rounded-lg px-3 py-2 text-sm font-bold text-mgGreen focus:ring-2 focus:ring-mgGreen focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">예치 기간 (개월)</label>
+                        <select id="calcMonths" onchange="calculateYield()" class="w-full bg-white border border-slate-300 rounded-lg px-3 py-2 text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-mgNavy focus:outline-none">
+                            <option value="12" selected>12개월 (1년)</option>
+                            <option value="24">24개월 (2년)</option>
+                            <option value="36">36개월 (3년)</option>
+                        </select>
+                    </div>
+
+                    <div class="p-3 bg-blue-50 rounded-lg text-xs text-mgNavy leading-relaxed border border-blue-100">
+                        💡 <strong>조합원 비과세 핵심:</strong> 새마을금고 예적금은 1인당 3,000만 원 한도 내에서 이자소득세(14%)가 면제되며, 농어촌특별세(1.4%)만 부과됩니다.
+                    </div>
+                </div>
+
+                <!-- Simulation Output Display -->
+                <div class="lg:col-span-7 flex flex-col justify-between space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Bank Column -->
+                        <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider block mb-1">시중은행 (일반과세 15.4%)</span>
+                            <div id="bankGrossInterest" class="text-xs text-slate-600">세전 이자: 0원</div>
+                            <div id="bankTax" class="text-xs text-red-500">원천징수 세금: -0원</div>
+                            <div class="mt-3 pt-2 border-t border-slate-200">
+                                <span class="text-xs text-slate-500">실제 세후 수령액</span>
+                                <div id="bankNetInterest" class="text-xl font-bold text-slate-800">0 원</div>
+                            </div>
+                        </div>
+
+                        <!-- MG Column -->
+                        <div class="bg-emerald-50/80 p-4 rounded-xl border border-emerald-200 relative">
+                            <span class="absolute top-3 right-3 bg-mgGreen text-white text-[10px] font-bold px-2 py-0.5 rounded-full">저율과세 1.4%</span>
+                            <span class="text-xs font-bold text-mgGreen uppercase tracking-wider block mb-1">MG새마을금고 (조합원)</span>
+                            <div id="mgGrossInterest" class="text-xs text-slate-600">세전 이자: 0원</div>
+                            <div id="mgTax" class="text-xs text-emerald-700">농특세 세금: -0원</div>
+                            <div class="mt-3 pt-2 border-t border-emerald-200">
+                                <span class="text-xs text-emerald-800 font-semibold">실제 세후 수령액</span>
+                                <div id="mgNetInterest" class="text-xl font-extrabold text-mgGreen">0 원</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Impact Highlights -->
+                    <div class="bg-mgNavy text-white p-5 rounded-xl space-y-3 shadow-md">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-700 pb-3">
+                            <span class="text-xs text-slate-300 font-medium">새마을금고 가입 시 세후 이자 추가 이득</span>
+                            <div id="taxBenefitDiff" class="text-2xl font-extrabold text-mgAccent">+0 원</div>
+                        </div>
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-xs">
+                            <span class="text-slate-300">시중은행에서 이와 동일한 세후 이자를 얻기 위한 <strong>필요 세전 금리</strong>:</span>
+                            <div id="equivalentRate" class="text-base font-bold text-emerald-400">연 0.00% 이상</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Strategic Action Plan -->
+        <section id="action-plan" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-4">
+            <div class="border-b border-slate-100 pb-3">
+                <h2 class="text-lg sm:text-xl font-bold text-mgNavy flex items-center gap-2">
+                    <span>🎯</span> 4. 수신 증대 및 고객 방어 실천 행동 전략 (Action Plan)
+                </h2>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">
+                    현장 영업점 및 모바일 채널에서 즉시 적용 가능한 4대 핵심 수신 확충 및 재유치 실행 지침입니다.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <!-- Action 1 -->
+                <div class="p-5 bg-slate-50 rounded-xl border-l-4 border-mgGreen space-y-2 hover:bg-emerald-50/30 transition">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-mgGreen text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">1</span>
+                        <h3 class="font-bold text-slate-800 text-sm">'세후 실효수익률' 창구 및 모바일 마케팅 소통 강화</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        표면 금리 단순 비교를 넘어 15.4% 세금 감면 혜택을 시각화한 <strong>'실제 통장에 찍히는 세후 이자 금액 비교표'</strong>를 창구 POP 및 MG더뱅킹 Push 알림으로 적극 안내.
+                    </p>
+                </div>
+
+                <!-- Action 2 -->
+                <div class="p-5 bg-slate-50 rounded-xl border-l-4 border-mgNavy space-y-2 hover:bg-blue-50/30 transition">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-mgNavy text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">2</span>
+                        <h3 class="font-bold text-slate-800 text-sm">5,000만 원 예금자보호 법적 안정성 적극 홍보</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        새마을금고법에 따라 각 법인 금고별로 1인당 5,000만 원까지 원금과 이자가 철저히 보호됨을 안내하여, 제2금융권 안정성에 대한 일부 고객 불안감을 완벽히 해소.
+                    </p>
+                </div>
+
+                <!-- Action 3 -->
+                <div class="p-5 bg-slate-50 rounded-xl border-l-4 border-mgAccent space-y-2 hover:bg-amber-50/30 transition">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-mgAccent text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">3</span>
+                        <h3 class="font-bold text-slate-800 text-sm">인터넷/모바일 (MG더뱅킹) 타겟팅 특판 라인업 강화</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        인터넷전문은행으로 이탈하는 20~40대 스마트폰 이용자층 흡수를 위해 비대면 전용 정기예적금 우대금리(+0.3%p ~ +0.5%p) 및 가입 편의성 지속 제고.
+                    </p>
+                </div>
+
+                <!-- Action 4 -->
+                <div class="p-5 bg-slate-50 rounded-xl border-l-4 border-purple-600 space-y-2 hover:bg-purple-50/30 transition">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-purple-600 text-white text-xs font-bold w-6 h-6 rounded-full flex items-center justify-center">4</span>
+                        <h3 class="font-bold text-slate-800 text-sm">만기 도래 자금 재유치 (Roll-over) 프로모션 실시</h3>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        하반기 만기 도래 고금리 예금 고객을 대상으로 자율 특판 상품을 사전 안내하고, 조합원 비과세 한도 잔여분을 재점검해주는 1:1 차별화 컨설팅 제공.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 text-xs py-6 border-t border-slate-800 mt-12">
+        <div class="max-w-7xl mx-auto px-4 text-center space-y-2">
+            <p>2026년 하반기 주요 금융권 예적금 금리 동향 및 수신 전략 분석 보고서 인터랙티브 시스템</p>
+            <p class="text-slate-500">본 자료는 분석 목적으로 작성되었으며, 실제 개별 금고 및 금융기관의 상품 조건에 따라 적용 금리가 다를 수 있습니다.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Data & Logic -->
+    <script>
+        // Master Dataset from Report
+        const rawData = [
+            { sector: "1금융권", bank: "KB국민은행", name: "KB Star 정기예금", type: "정기예금", months: 12, basicRate: 2.90, maxRate: 3.00, tax: "일반과세(15.4%)", note: "KB Star뱅킹 전용 / 조건 단순" },
+            { sector: "1금융권", bank: "신한은행", name: "신한 S드림 정기예금", type: "정기예금", months: 12, basicRate: 2.85, maxRate: 3.10, tax: "일반과세(15.4%)", note: "급여이체 및 신용카드 실적 연동" },
+            { sector: "1금융권", bank: "하나은행", name: "하나의정기예금", type: "정기예금", months: 12, basicRate: 2.90, maxRate: 3.20, tax: "일반과세(15.4%)", note: "마케팅 동의 및 앱 출석체크" },
+            { sector: "1금융권", bank: "우리은행", name: "WON플러스 예금", type: "정기예금", months: 12, basicRate: 2.90, maxRate: 3.10, tax: "일반과세(15.4%)", note: "원뱅킹 전용, 복잡한 조건 없음" },
+            { sector: "1금융권", bank: "NH농협은행", name: "NH올원파이프라인 적금", type: "정기적금", months: 12, basicRate: 2.80, maxRate: 3.50, tax: "일반과세(15.4%)", note: "농협 계좌 주거래 조건 충족 시" },
+            { sector: "인터넷은행", bank: "카카오뱅크", name: "카카오뱅크 정기예금", type: "정기예금", months: 12, basicRate: 3.10, maxRate: 3.20, tax: "일반과세(15.4%)", note: "비대면 간편가입 / 자동연장 혜택" },
+            { sector: "인터넷은행", bank: "케이뱅크", name: "코드K 정기예금", type: "정기예금", months: 12, basicRate: 3.00, maxRate: 3.15, tax: "일반과세(15.4%)", note: "금리보장서비스 적용" },
+            { sector: "인터넷은행", bank: "토스뱅크", name: "토스뱅크 정기적금", type: "정기적금", months: 12, basicRate: 3.00, maxRate: 4.50, tax: "일반과세(15.4%)", note: "자동이체 성공 시 단계별 우대금리" },
+            { sector: "상호금융", bank: "MG새마을금고", name: "MG더뱅킹정기예금", type: "정기예금", months: 12, basicRate: 3.20, maxRate: 3.91, tax: "저율과세(1.4%)", note: "비대면 특판/우수금고 최고금리 기준" },
+            { sector: "상호금융", bank: "MG새마을금고", name: "MG더뱅킹정기적금", type: "정기적금", months: 12, basicRate: 3.40, maxRate: 4.44, tax: "저율과세(1.4%)", note: "모바일 특판 및 우수 조합 이율" },
+            { sector: "상호금융", bank: "신협", name: "청운신협 정기예탁금", type: "정기예금", months: 12, basicRate: 3.00, maxRate: 3.60, tax: "저율과세(1.4%)", note: "조합원 가입 시 비과세 혜택" },
+            { sector: "상호금융", bank: "수협(회원조합)", name: "Sh첫만남우대예금", type: "정기예금", months: 12, basicRate: 2.50, maxRate: 3.55, tax: "저율과세(1.4%)", note: "첫거래 및 마케팅 동의 조건" },
+            { sector: "저축은행", bank: "대백저축은행", name: "애플정기예금", type: "정기예금", months: 12, basicRate: 4.10, maxRate: 4.10, tax: "일반과세(15.4%)", note: "창구 및 비대면 가입 동일" },
+            { sector: "저축은행", bank: "상상인저축은행", name: "뱅뱅뱅 회전정기예금", type: "정기예금", months: 12, basicRate: 3.50, maxRate: 4.40, tax: "일반과세(15.4%)", note: "회전주기(1년) 충족 시 우대" },
+            { sector: "저축은행", bank: "애큐온저축은행", name: "정기적금", type: "정기적금", months: 12, basicRate: 4.30, maxRate: 6.50, tax: "일반과세(15.4%)", note: "신용카드 발급 및 마이데이터 연동" }
+        ];
+
+        let currentSector = 'ALL';
+        let sortKey = null;
+        let sortAsc = false;
+
+        // Initialize Application
+        document.addEventListener('DOMContentLoaded', () => {
+            initCharts();
+            renderTable();
+            calculateYield();
+        });
+
+        // 1. Chart Rendering Logic
+        function initCharts() {
+            // Chart 1: Sector Rates Comparison
+            const ctx1 = document.getElementById('sectorRateChart').getContext('2d');
+            new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['1금융권 (시중)', '인터넷전문은행', 'MG 새마을금고', '저축은행'],
+                    datasets: [
+                        {
+                            label: '정기예금 최고금리 (%)',
+                            data: [3.20, 3.20, 3.91, 4.40],
+                            backgroundColor: '#005B96',
+                            borderRadius: 6
+                        },
+                        {
+                            label: '정기적금 최고금리 (%)',
+                            data: [3.50, 4.50, 4.44, 6.50],
+                            backgroundColor: '#00875A',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y + '%';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: false, min: 2.0, max: 7.0, ticks: { stepSize: 1.0 } }
+                    }
+                }
+            });
+
+            // Chart 2: Net Interest Income for 30M
+            const ctx2 = document.getElementById('netInterestChart').getContext('2d');
+            new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels: ['시중은행 (3.10%)', 'MG새마을금고 (3.91%)', '저축은행 (4.10%)'],
+                    datasets: [
+                        {
+                            label: '세후 실수령 이자 (원)',
+                            data: [786780, 1156578, 1040340],
+                            backgroundColor: ['#64748B', '#00875A', '#D97706'],
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return '세후 이자: ' + context.parsed.x.toLocaleString() + ' 원';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { callback: v => (v/10000) + '만원' } }
+                    }
+                }
+            });
+        }
+
+        // 2. Data Table Logic & Filtering
+        function getFilteredData() {
+            const typeFilter = document.getElementById('productTypeFilter').value;
+            const searchKeyword = document.getElementById('searchInput').value.trim().toLowerCase();
+
+            let filtered = rawData.filter(item => {
+                const matchSector = (currentSector === 'ALL') || (item.sector === currentSector);
+                const matchType = (typeFilter === 'ALL') || (item.type === typeFilter);
+                const matchSearch = item.bank.toLowerCase().includes(searchKeyword) || 
+                                    item.name.toLowerCase().includes(searchKeyword) || 
+                                    item.note.toLowerCase().includes(searchKeyword);
+                return matchSector && matchType && matchSearch;
+            });
+
+            if (sortKey) {
+                filtered.sort((a, b) => {
+                    const valA = a[sortKey];
+                    const valB = b[sortKey];
+                    return sortAsc ? valA - valB : valB - valA;
+                });
+            }
+
+            return filtered;
+        }
+
+        function filterSector(sector) {
+            currentSector = sector;
+            document.querySelectorAll('.sector-btn').forEach(btn => {
+                if (btn.innerText.includes(sector === 'ALL' ? '전체' : (sector === '상호금융' ? '상호금융' : sector))) {
+                    btn.className = "sector-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-mgNavy text-white shadow-sm transition";
+                } else {
+                    btn.className = "sector-btn px-3 py-1.5 rounded-lg text-xs font-semibold bg-white text-slate-700 hover:bg-slate-200 transition";
+                }
+            });
+            renderTable();
+        }
+
+        function sortBy(key) {
+            if (sortKey === key) {
+                sortAsc = !sortAsc;
+            } else {
+                sortKey = key;
+                sortAsc = false;
+            }
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('depositTableBody');
+            const filtered = getFilteredData();
+
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center p-6 text-slate-400">조건에 일치하는 예적금 상품 데이터가 없습니다.</td></tr>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const isMG = item.bank.includes("새마을금고");
+                const rowClass = isMG ? "bg-emerald-50/40 font-medium" : "hover:bg-slate-50";
+
+                tbody.innerHTML += `
+                    <tr class="${rowClass}">
+                        <td class="p-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${
+                                item.sector === '1금융권' ? 'bg-slate-100 text-slate-700' :
+                                item.sector === '인터넷은행' ? 'bg-blue-100 text-mgNavy' :
+                                item.sector === '상호금융' ? 'bg-emerald-100 text-mgGreen' : 'bg-amber-100 text-amber-800'
+                            }">${item.sector}</span>
+                        </td>
+                        <td class="p-3 font-semibold ${isMG ? 'text-mgGreen font-bold' : 'text-slate-800'}">${item.bank}</td>
+                        <td class="p-3">${item.name}</td>
+                        <td class="p-3 text-center">
+                            <span class="px-1.5 py-0.5 rounded text-[10px] ${item.type === '정기예금' ? 'bg-blue-50 text-blue-600' : 'bg-purple-50 text-purple-600'}">${item.type}</span>
+                        </td>
+                        <td class="p-3 text-right font-medium text-slate-700">${item.basicRate.toFixed(2)}%</td>
+                        <td class="p-3 text-right font-bold ${isMG ? 'text-mgGreen text-sm' : 'text-slate-900'}">${item.maxRate.toFixed(2)}%</td>
+                        <td class="p-3 text-center">
+                            <span class="text-[11px] ${item.tax.includes('저율') ? 'text-mgGreen font-bold' : 'text-slate-500'}">${item.tax}</span>
+                        </td>
+                        <td class="p-3 text-slate-600 text-[11px]">${item.note}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        // 3. Export Table to Excel (CSV with UTF-8 BOM)
+        function exportToExcel() {
+            const dataToExport = getFilteredData();
+
+            if (dataToExport.length === 0) {
+                alert("내보낼 데이터가 없습니다.");
+                return;
+            }
+
+            // UTF-8 BOM for Excel Korean support
+            let csvContent = "\uFEFF"; 
+            csvContent += "금융권역,기관명,대표 상품명,상품종류,만기(개월),기본금리(%),최고우대금리(%),과세구분,주요 우대조건 및 특징\n";
+
+            dataToExport.forEach(item => {
+                const row = [
+                    `"${item.sector}"`,
+                    `"${item.bank}"`,
+                    `"${item.name}"`,
+                    `"${item.type}"`,
+                    item.months,
+                    item.basicRate,
+                    item.maxRate,
+                    `"${item.tax}"`,
+                    `"${item.note.replace(/"/g, '""')}"`
+                ];
+                csvContent += row.join(",") + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            const today = new Date().toISOString().slice(0, 10);
+            const fileName = `2026_주요금융권_예적금금리현황_${today}.csv`;
+
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // 4. Tax & Yield Calculator Logic
+        function setCalcPrincipal(val) {
+            document.getElementById('calcPrincipal').value = val;
+            calculateYield();
+        }
+
+        function calculateYield() {
+            const principal = parseFloat(document.getElementById('calcPrincipal').value) || 0;
+            const bankRate = parseFloat(document.getElementById('calcBankRate').value) || 0;
+            const mgRate = parseFloat(document.getElementById('calcMgRate').value) || 0;
+            const months = parseInt(document.getElementById('calcMonths').value) || 12;
+
+            const years = months / 12;
+
+            // Bank Calculation (Standard Tax 15.4%)
+            const bankGross = principal * (bankRate / 100) * years;
+            const bankTaxVal = bankGross * 0.154;
+            const bankNet = bankGross - bankTaxVal;
+
+            // MG Calculation (Low Tax 1.4% up to 30M)
+            const nonTaxableCap = 30000000;
+            const mgGross = principal * (mgRate / 100) * years;
+            let mgTaxVal = 0;
+
+            if (principal <= nonTaxableCap) {
+                // All low tax 1.4%
+                mgTaxVal = mgGross * 0.014;
+            } else {
+                // Portion up to 30M gets 1.4%, remainder gets 15.4%
+                const lowTaxGross = nonTaxableCap * (mgRate / 100) * years;
+                const standardTaxGross = (principal - nonTaxableCap) * (mgRate / 100) * years;
+                mgTaxVal = (lowTaxGross * 0.014) + (standardTaxGross * 0.154);
+            }
+
+            const mgNet = mgGross - mgTaxVal;
+            const diff = mgNet - bankNet;
+
+            // Equivalent Gross Bank Rate needed to match MG net profit
+            const requiredBankGross = mgNet;
+            const equivalentRateVal = (requiredBankGross / (1 - 0.154)) / (principal * years) * 100;
+
+            // Update UI
+            document.getElementById('bankGrossInterest').innerText = `세전 이자: ${Math.round(bankGross).toLocaleString()} 원`;
+            document.getElementById('bankTax').innerText = `원천징수 세금(15.4%): -${Math.round(bankTaxVal).toLocaleString()} 원`;
+            document.getElementById('bankNetInterest').innerText = `${Math.round(bankNet).toLocaleString()} 원`;
+
+            document.getElementById('mgGrossInterest').innerText = `세전 이자: ${Math.round(mgGross).toLocaleString()} 원`;
+            document.getElementById('mgTax').innerText = `농특세 세금(${principal <= nonTaxableCap ? '1.4%' : '혼합과세'}): -${Math.round(mgTaxVal).toLocaleString()} 원`;
+            document.getElementById('mgNetInterest').innerText = `${Math.round(mgNet).toLocaleString()} 원`;
+
+            document.getElementById('taxBenefitDiff').innerText = `+${Math.round(diff).toLocaleString()} 원 (${diff >= 0 ? '이득' : '손실'})`;
+            document.getElementById('equivalentRate').innerText = `연 ${equivalentRateVal.toFixed(2)}% 이상`;
+        }
+    </script>
+</body>
+</html>
+```eod
+```
+
+### 업데이트 사항 요약
+
+1. **'📊 엑셀 다운로드' 버튼 추가**:
+   - `제2절 금리 비교 현황` 표의 필터 및 검색 컨트롤 영역 오른쪽에 에메랄드 컬러의 **[📊 엑셀 다운로드]** 버튼을 배치했습니다.
+
+2. **UTF-8 BOM 기반 CSV 다운로드 로직 구현**:
+   - 현재 화면에 필터링 및 검색된 최신 예적금 데이터 목록만 즉시 엑셀(CSV) 파일 형태로 다운로드됩니다.
+   - Excel에서 한글 깨짐 없이 바로 열릴 수 있도록 UTF-8 BOM (`\uFEFF`) 처리 및 특수문자 따옴표 이스케이프 처리가 적용되어 있습니다.
