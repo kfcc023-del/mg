@@ -1,0 +1,995 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>업무 FAQ 검색</title>
+  <style>
+    :root {
+      --bg: #f4fbff;
+      --surface: #ffffff;
+      --surface-soft: #f8fdff;
+      --text: #173042;
+      --muted: #6f8391;
+      --line: #dcecf3;
+      --primary: #2f9edb;
+      --primary-dark: #1e7fb8;
+      --summer-yellow: #ffd45c;
+      --summer-orange: #ff9c5a;
+      --summer-aqua: #51c4c1;
+      --summer-sky: #7bc7f2;
+      --shadow: 0 18px 45px rgba(50, 133, 173, 0.12);
+      --shadow-soft: 0 8px 22px rgba(50, 133, 173, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at 8% 2%, rgba(255, 212, 92, 0.30), transparent 22%),
+        radial-gradient(circle at 95% 6%, rgba(123, 199, 242, 0.28), transparent 24%),
+        linear-gradient(180deg, #eefbff 0%, #f8fdff 45%, #fffdf7 100%);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .page {
+      width: min(1040px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 64px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 32px 34px;
+      border: 1px solid rgba(255,255,255,.92);
+      border-radius: 30px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.97), rgba(240,251,255,.95) 58%, rgba(255,249,224,.94));
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      right: -65px;
+      top: -85px;
+      background: radial-gradient(circle, rgba(255,212,92,.42) 0 32%, rgba(255,212,92,.12) 33% 58%, transparent 59%);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .hero-icon {
+      width: 64px;
+      height: 64px;
+      flex: 0 0 64px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      color: #ffffff;
+      background: linear-gradient(135deg, #42b8e7, #4fc3a8);
+      box-shadow: 0 12px 24px rgba(66, 184, 231, .25);
+    }
+
+    .hero-icon svg {
+      width: 30px;
+      height: 30px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+      color: #f29b38;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .04em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 38px);
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+    }
+
+    .hero p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+    }
+
+    .search-panel {
+      background: rgba(255,255,255,.94);
+      backdrop-filter: blur(10px);
+      border: 1px solid #dceef5;
+      border-radius: 24px;
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+      margin-bottom: 22px;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+    }
+
+    .search-box svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      width: 20px;
+      height: 20px;
+      transform: translateY(-50%);
+      color: #8a94a7;
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      height: 54px;
+      border: 1px solid #dce1ea;
+      border-radius: 16px;
+      padding: 0 18px 0 48px;
+      background: #fbfcff;
+      color: var(--text);
+      outline: none;
+      transition: .2s ease;
+    }
+
+    .search-input::placeholder {
+      color: #9aa3b2;
+    }
+
+    .search-input:focus {
+      background: #fff;
+      border-color: #52b8e7;
+      box-shadow: 0 0 0 4px rgba(82,184,231,.12);
+    }
+
+    .reset-btn {
+      height: 54px;
+      border: 0;
+      border-radius: 16px;
+      padding: 0 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #35a9df, #39bca7);
+      color: #fff;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 8px 18px rgba(53,169,223,.18);
+      transition: .2s ease;
+    }
+
+    .reset-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .reset-btn:hover {
+      transform: translateY(-1px);
+      background: linear-gradient(135deg, #2497cc, #2fa58f);
+    }
+
+    .filter-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      color: #70788a;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .filter-label svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .filter-btn {
+      border: 1px solid #dfe3ea;
+      background: #fff;
+      color: #596174;
+      border-radius: 999px;
+      padding: 9px 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+      transition: .2s ease;
+    }
+
+    .filter-btn .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+      opacity: .8;
+    }
+
+    .filter-btn:hover {
+      transform: translateY(-1px);
+      border-color: #c8ced9;
+      box-shadow: 0 5px 14px rgba(32,48,89,.06);
+    }
+
+    .filter-btn.active {
+      color: #fff;
+      box-shadow: 0 7px 17px rgba(32,48,89,.12);
+    }
+
+    .category-all.active {
+      background: linear-gradient(135deg, #42aee0, #4cc6b3);
+      border-color: transparent;
+    }
+    .category-education.active {
+      background: #3aa9e8;
+      border-color: #3aa9e8;
+    }
+    .category-document.active {
+      background: #7a78df;
+      border-color: #7a78df;
+    }
+    .category-it.active {
+      background: #37b89f;
+      border-color: #37b89f;
+    }
+    .category-security.active {
+      background: #f06b63;
+      border-color: #f06b63;
+    }
+    .category-welfare.active {
+      background: #f3a542;
+      border-color: #f3a542;
+    }
+
+    .result-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin: 26px 4px 12px;
+    }
+
+    .result-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .result-title-wrap svg {
+      width: 20px;
+      height: 20px;
+      color: var(--primary);
+    }
+
+    .result-count {
+      font-size: 17px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .current-filter {
+      padding: 7px 11px;
+      border-radius: 999px;
+      background: #e7f7ff;
+      color: #2587b7;
+      font-size: 12px;
+      font-weight: 900;
+      border: 1px solid #cfedf9;
+    }
+
+    .result-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .faq-card {
+      position: relative;
+      overflow: hidden;
+      background: rgba(255,255,255,.96);
+      border: 1px solid #dcecf3;
+      border-radius: 22px;
+      padding: 22px 23px 21px;
+      box-shadow: var(--shadow-soft);
+      transition: .22s ease;
+    }
+
+    .faq-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #d6dbe6;
+    }
+
+    .faq-card[data-category="교육"]::before { background: #3aa9e8; }
+    .faq-card[data-category="문서"]::before { background: #7a78df; }
+    .faq-card[data-category="IT"]::before { background: #37b89f; }
+    .faq-card[data-category="보안"]::before { background: #f06b63; }
+    .faq-card[data-category="복지"]::before { background: #f3a542; }
+
+    .faq-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 32px rgba(32,48,89,.10);
+      border-color: #dce1eb;
+    }
+
+    .faq-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .question-wrap {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .q-icon {
+      margin-top: 1px;
+      width: 28px;
+      height: 28px;
+      flex: 0 0 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: #eef1ff;
+      color: #5969eb;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .question {
+      margin: 0;
+      font-size: 17px;
+      line-height: 1.55;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .category {
+      flex-shrink: 0;
+      border-radius: 999px;
+      padding: 7px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      font-weight: 900;
+      border: 1px solid transparent;
+    }
+
+    .category svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .category[data-category="교육"] {
+      background: #e8f7ff;
+      color: #258bc3;
+      border-color: #cfeefc;
+    }
+    .category[data-category="문서"] {
+      background: #f0efff;
+      color: #6864c7;
+      border-color: #dfddff;
+    }
+    .category[data-category="IT"] {
+      background: #e8faf6;
+      color: #228d79;
+      border-color: #d0f1e9;
+    }
+    .category[data-category="보안"] {
+      background: #fff1ef;
+      color: #d95852;
+      border-color: #ffdcd8;
+    }
+    .category[data-category="복지"] {
+      background: #fff6e6;
+      color: #d98b27;
+      border-color: #ffe7bd;
+    }
+
+    .answer {
+      margin: 0 0 0 38px;
+      padding: 14px 0 0;
+      border-top: 1px solid #eef0f4;
+      color: #596174;
+      font-size: 14.5px;
+      line-height: 1.75;
+    }
+
+    mark {
+      background: #fff0a8;
+      color: #3b3320;
+      padding: 1px 3px;
+      border-radius: 4px;
+      box-shadow: inset 0 -1px 0 rgba(180,145,0,.12);
+    }
+
+    .empty-state {
+      background: rgba(255,255,255,.95);
+      border: 1px dashed #ced4df;
+      border-radius: 22px;
+      padding: 48px 24px;
+      text-align: center;
+      box-shadow: var(--shadow-soft);
+    }
+
+    .empty-icon {
+      width: 58px;
+      height: 58px;
+      margin: 0 auto 15px;
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: #eef9fd;
+      color: #4fa8ce;
+    }
+
+    .empty-icon svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .empty-title {
+      margin: 0 0 8px;
+      color: #303848;
+      font-size: 17px;
+      font-weight: 900;
+    }
+
+    .empty-desc {
+      margin: 0;
+      color: #7a8391;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      color: #9aa1ae;
+      font-size: 12px;
+    }
+
+
+    .satisfaction {
+      margin: 16px 0 0 38px;
+      padding-top: 14px;
+      border-top: 1px dashed #e5e8ef;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .satisfaction-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #6b7280;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .satisfaction-label svg {
+      width: 16px;
+      height: 16px;
+      color: #f59e0b;
+    }
+
+    .rating-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .stars {
+      display: flex;
+      gap: 4px;
+    }
+
+    .star-btn {
+      width: 32px;
+      height: 32px;
+      border: 0;
+      padding: 0;
+      border-radius: 9px;
+      display: grid;
+      place-items: center;
+      background: #f5f6f8;
+      color: #c7ccd5;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+
+    .star-btn:hover {
+      transform: translateY(-1px) scale(1.04);
+      background: #fff8e6;
+      color: #f59e0b;
+    }
+
+    .star-btn.active {
+      background: #fff7d8;
+      color: #f4b942;
+      box-shadow: inset 0 0 0 1px #f8e29d;
+    }
+
+    .star-btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .rating-status {
+      min-width: 78px;
+      color: #8a93a3;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .rating-status.selected {
+      color: #b7791f;
+    }
+
+    @media (max-width: 720px) {
+      .page {
+        padding-top: 24px;
+      }
+
+      .hero {
+        padding: 24px 22px;
+      }
+
+      .hero-content {
+        align-items: flex-start;
+      }
+
+      .hero-icon {
+        width: 52px;
+        height: 52px;
+        flex-basis: 52px;
+        border-radius: 17px;
+      }
+
+      .hero-icon svg {
+        width: 25px;
+        height: 25px;
+      }
+
+      .search-panel {
+        padding: 16px;
+        border-radius: 20px;
+      }
+
+      .search-row {
+        flex-direction: column;
+      }
+
+      .reset-btn {
+        width: 100%;
+      }
+
+      .result-header {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .faq-top {
+        flex-direction: column;
+      }
+
+      .answer {
+        margin-left: 0;
+      }
+
+      .satisfaction {
+        margin-left: 0;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="hero-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+            <path d="M9.5 9a2.5 2.5 0 1 1 4.2 1.8c-.9.8-1.7 1.2-1.7 2.2"/>
+            <path d="M12 16h.01"/>
+          </svg>
+        </div>
+        <div>
+          <div class="eyebrow">WORK FAQ HELPER</div>
+          <h1>업무 FAQ 검색</h1>
+          <p>질문이나 키워드를 입력하면 등록된 FAQ 안에서 관련 내용을 빠르게 찾아드립니다.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="search-panel">
+      <div class="search-row">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="m20 20-3.5-3.5"></path>
+          </svg>
+          <input
+            id="searchInput"
+            class="search-input"
+            type="search"
+            placeholder="질문이나 키워드를 입력하세요."
+            aria-label="FAQ 검색어"
+          />
+        </div>
+
+        <button id="showAllBtn" class="reset-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path>
+            <path d="M3 3v5h5"></path>
+          </svg>
+          전체보기
+        </button>
+      </div>
+
+      <div class="filter-label">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M4 6h16M7 12h10M10 18h4"></path>
+        </svg>
+        분류
+      </div>
+
+      <div class="filters" aria-label="FAQ 분류">
+        <button class="filter-btn active category-all" data-category="전체" type="button"><span class="dot"></span>전체</button>
+        <button class="filter-btn category-education" data-category="교육" type="button"><span class="dot"></span>교육</button>
+        <button class="filter-btn category-document" data-category="문서" type="button"><span class="dot"></span>문서</button>
+        <button class="filter-btn category-it" data-category="IT" type="button"><span class="dot"></span>IT</button>
+        <button class="filter-btn category-security" data-category="보안" type="button"><span class="dot"></span>보안</button>
+        <button class="filter-btn category-welfare" data-category="복지" type="button"><span class="dot"></span>복지</button>
+      </div>
+    </section>
+
+    <section>
+      <div class="result-header">
+        <div class="result-title-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+            <path d="M4 6h16M4 12h16M4 18h10"></path>
+          </svg>
+          <div id="resultCount" class="result-count">검색 결과 0건</div>
+        </div>
+        <div id="currentFilter" class="current-filter">분류: 전체</div>
+      </div>
+
+      <div id="resultList" class="result-list"></div>
+    </section>
+
+    <div class="footer-note">등록된 FAQ 데이터만 검색하며, 없는 답변은 임의로 생성하지 않습니다.</div>
+  </main>
+
+  <script>
+    const faqData = [
+  {
+    "category": "교육",
+    "question": "교육 신청은 어디에서 하나요?",
+    "answer_seed": "교육 포털의 과정 검색 후 신청 메뉴를 사용합니다."
+  },
+  {
+    "category": "교육",
+    "question": "신청한 교육을 취소하려면 어떻게 하나요?",
+    "answer_seed": "신청내역에서 취소 가능 여부를 확인합니다."
+  },
+  {
+    "category": "문서",
+    "question": "주간 업무보고에는 무엇을 넣어야 하나요?",
+    "answer_seed": "주요 실적, 이슈, 다음 주 계획을 중심으로 작성합니다."
+  },
+  {
+    "category": "IT",
+    "question": "사내 시스템 접속이 되지 않습니다.",
+    "answer_seed": "네트워크, 브라우저, 계정 상태를 순서대로 확인합니다."
+  },
+  {
+    "category": "보안",
+    "question": "ChatGPT에 내부 업무자료를 넣어도 되나요?",
+    "answer_seed": "교육에서는 합성자료를 사용하고, 실제 자료는 조직의 보안 및 AI 사용 기준을 먼저 확인합니다."
+  },
+  {
+    "category": "복지",
+    "question": "사택 대상 기준이 어떻게 되나요?",
+    "answer_seed": "수습 종료 후 정직원이 되면 사택거리 기준만 충족된다면 바로 신청 가능합니다."
+  },
+  {
+    "category": "IT",
+    "question": "대외연계 솔루션은 어떤걸 사용하나요?",
+    "answer_seed": "본회엔 TMAX 제품과 INZENT 제품이 있습니다."
+  }
+];
+
+    const searchInput = document.getElementById("searchInput");
+    const showAllBtn = document.getElementById("showAllBtn");
+    const filterButtons = document.querySelectorAll(".filter-btn");
+    const resultCount = document.getElementById("resultCount");
+    const currentFilter = document.getElementById("currentFilter");
+    const resultList = document.getElementById("resultList");
+
+    let selectedCategory = "전체";
+
+    const categoryIcons = {
+      "교육": `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="m3 10 9-5 9 5-9 5-9-5z"></path>
+          <path d="M7 12v4c3 2 7 2 10 0v-4"></path>
+        </svg>
+      `,
+      "문서": `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 3h9l3 3v15H6z"></path>
+          <path d="M14 3v4h4"></path>
+          <path d="M9 12h6M9 16h6"></path>
+        </svg>
+      `,
+      "IT": `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="13" rx="2"></rect>
+          <path d="M8 21h8M12 17v4"></path>
+        </svg>
+      `,
+      "보안": `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M12 3 5 6v5c0 5 3 8 7 10 4-2 7-5 7-10V6z"></path>
+          <path d="m9 12 2 2 4-4"></path>
+        </svg>
+      `,
+      "복지": `
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"></path>
+        </svg>
+      `
+    };
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function escapeRegExp(text) {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    }
+
+    function highlightText(text, keyword) {
+      const safeText = escapeHtml(text);
+      const trimmedKeyword = keyword.trim();
+
+      if (!trimmedKeyword) {
+        return safeText;
+      }
+
+      const regex = new RegExp(`(${escapeRegExp(escapeHtml(trimmedKeyword))})`, "gi");
+      return safeText.replace(regex, "<mark>$1</mark>");
+    }
+
+
+    function getRatingKey(question) {
+      return `faq-rating:${question}`;
+    }
+
+    function getSavedRating(question) {
+      return Number(localStorage.getItem(getRatingKey(question)) || 0);
+    }
+
+    function starIcon() {
+      return `
+        <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true">
+          <path d="m12 2.8 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-2.9L6.4 20l1.1-6.2L3 9.4l6.2-.9L12 2.8z"></path>
+        </svg>
+      `;
+    }
+
+    function ratingHtml(question) {
+      const savedRating = getSavedRating(question);
+
+      const stars = [1, 2, 3, 4, 5].map((score) => `
+        <button
+          class="star-btn ${score <= savedRating ? "active" : ""}"
+          type="button"
+          data-score="${score}"
+          aria-label="만족도 ${score}점"
+          title="${score}점"
+        >
+          ${starIcon()}
+        </button>
+      `).join("");
+
+      return `
+        <div class="satisfaction" data-question="${escapeHtml(question)}">
+          <div class="satisfaction-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+              <path d="M7 10v10H4V10h3z"></path>
+              <path d="M7 18h10a2 2 0 0 0 2-1.6l1-5A2 2 0 0 0 18 9h-4l1-4a2 2 0 0 0-2-2l-1 4-5 4"></path>
+            </svg>
+            이 답변은 도움이 되었나요?
+          </div>
+
+          <div class="rating-wrap">
+            <div class="stars">${stars}</div>
+            <div class="rating-status ${savedRating ? "selected" : ""}">
+              ${savedRating ? `${savedRating}점 선택됨` : "점수를 선택해 주세요"}
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderFaqs() {
+      const keyword = searchInput.value.trim().toLowerCase();
+
+      const filtered = faqData.filter((faq) => {
+        const matchesCategory =
+          selectedCategory === "전체" || faq.category === selectedCategory;
+
+        const searchableText =
+          `${faq.question} ${faq.answer_seed} ${faq.category}`.toLowerCase();
+
+        const matchesKeyword =
+          keyword === "" || searchableText.includes(keyword);
+
+        return matchesCategory && matchesKeyword;
+      });
+
+      resultCount.textContent = `검색 결과 ${filtered.length}건`;
+      currentFilter.textContent = `분류: ${selectedCategory}`;
+
+      if (filtered.length === 0) {
+        resultList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                <circle cx="11" cy="11" r="7"></circle>
+                <path d="m20 20-3.5-3.5"></path>
+                <path d="M8.5 11h5"></path>
+              </svg>
+            </div>
+            <p class="empty-title">등록된 FAQ에서 답변을 찾을 수 없습니다.</p>
+            <p class="empty-desc">관련 담당부서 또는 공식 안내자료를 확인해 주세요.</p>
+          </div>
+        `;
+        return;
+      }
+
+      resultList.innerHTML = filtered
+        .map(
+          (faq) => `
+            <article class="faq-card" data-category="${escapeHtml(faq.category)}">
+              <div class="faq-top">
+                <div class="question-wrap">
+                  <div class="q-icon">Q</div>
+                  <h2 class="question">${highlightText(faq.question, searchInput.value)}</h2>
+                </div>
+                <span class="category" data-category="${escapeHtml(faq.category)}">
+                  ${categoryIcons[faq.category] || ""}
+                  ${highlightText(faq.category, searchInput.value)}
+                </span>
+              </div>
+              <p class="answer">${highlightText(faq.answer_seed, searchInput.value)}</p>
+              ${ratingHtml(faq.question)}
+            </article>
+          `
+        )
+        .join("");
+    }
+
+    searchInput.addEventListener("input", renderFaqs);
+
+    filterButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        selectedCategory = button.dataset.category;
+
+        filterButtons.forEach((btn) => btn.classList.remove("active"));
+        button.classList.add("active");
+
+        renderFaqs();
+      });
+    });
+
+
+    resultList.addEventListener("click", (event) => {
+      const starButton = event.target.closest(".star-btn");
+      if (!starButton) return;
+
+      const satisfaction = starButton.closest(".satisfaction");
+      const question = satisfaction.dataset.question;
+      const score = Number(starButton.dataset.score);
+
+      localStorage.setItem(getRatingKey(question), String(score));
+
+      satisfaction.querySelectorAll(".star-btn").forEach((button) => {
+        button.classList.toggle(
+          "active",
+          Number(button.dataset.score) <= score
+        );
+      });
+
+      const status = satisfaction.querySelector(".rating-status");
+      status.textContent = `${score}점 선택됨`;
+      status.classList.add("selected");
+    });
+
+    showAllBtn.addEventListener("click", () => {
+      searchInput.value = "";
+      selectedCategory = "전체";
+
+      filterButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.category === "전체");
+      });
+
+      renderFaqs();
+      searchInput.focus();
+    });
+
+    renderFaqs();
+  </script>
+</body>
+</html>
